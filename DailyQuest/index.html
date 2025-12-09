@@ -521,7 +521,7 @@
             <span>→</span>
         </button>
         
-        <button class="menu-btn">
+        <button class="menu-btn" onclick="showTitles()">
             <span>🏆</span>
             <div class="btn-text">
                 칭호 보기
@@ -589,6 +589,44 @@
             <div class="titles-section">
                 <div class="titles-header">🏆 획득한 칭호</div>
                 <div class="titles-grid" id="titlesGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Titles Screen -->
+    <div class="quest-screen" id="titlesScreen">
+        <button class="back-btn" onclick="goBackFromTitles()">← 메인으로</button>
+
+        <div class="container">
+            <div class="header">
+                <div class="title-section">
+                    <div class="title-info">
+                        <div class="title-label">현재 칭호</div>
+                        <div class="title-name">
+                            <span id="titleIcon2">🌱</span>
+                            <span id="titleName2">정리 초심자</span>
+                        </div>
+                    </div>
+                    <div class="level-info">
+                        <div class="title-label">레벨</div>
+                        <div class="level-number" id="level2">1</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quests-header">
+                <div class="quests-title">🏆 모든 칭호</div>
+            </div>
+
+            <div id="titlesDetailList"></div>
+
+            <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 20px; padding: 30px; margin-top: 20px;">
+                <div style="font-size: 20px; font-weight: bold; color: white; margin-bottom: 15px;">💡 칭호 획득 방법</div>
+                <div style="color: rgba(255, 255, 255, 0.8); line-height: 1.8;">
+                    퀘스트를 완료하여 EXP를 모으고 레벨업하면<br>
+                    자동으로 새로운 칭호가 해금됩니다!<br><br>
+                    <strong style="color: #ffd700;">레벨업 = 새로운 칭호 획득</strong>
+                </div>
             </div>
         </div>
     </div>
@@ -797,6 +835,52 @@
         function goBack() {
             document.getElementById('questScreen').classList.remove('active');
             document.getElementById('menu').classList.add('active');
+        }
+
+        function showTitles() {
+            document.getElementById('menu').classList.remove('active');
+            document.getElementById('titlesScreen').classList.add('active');
+            updateTitlesScreen();
+        }
+
+        function goBackFromTitles() {
+            document.getElementById('titlesScreen').classList.remove('active');
+            document.getElementById('menu').classList.add('active');
+        }
+
+        function updateTitlesScreen() {
+            const title = getTitle();
+            document.getElementById('titleIcon2').textContent = title.icon;
+            document.getElementById('titleName2').textContent = title.name;
+            document.getElementById('level2').textContent = state.level;
+
+            const list = document.getElementById('titlesDetailList');
+            list.innerHTML = '';
+
+            titles.forEach(t => {
+                const unlocked = state.level >= t.level;
+                const status = unlocked ? '✅  획득 완료' : `🔒 Lv.${t.level}에 해금`;
+                const statusColor = unlocked ? '#10b981' : 'rgba(255, 255, 255, 0.5)';
+                
+                list.innerHTML += `
+                    <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 15px; padding: 25px; margin-bottom: 15px; ${unlocked ? 'border: 2px solid rgba(255, 215, 0, 0.5);' : 'opacity: 0.6;'}">
+                        <div style="display: flex; align-items: center; gap: 20px;">
+                            <div style="font-size: 60px; ${unlocked ? '' : 'filter: grayscale(1); opacity: 0.3;'}">${t.icon}</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 24px; font-weight: bold; color: ${unlocked ? 'white' : 'rgba(255, 255, 255, 0.5)'}; margin-bottom: 8px;">
+                                    ${t.name}
+                                </div>
+                                <div style="font-size: 14px; color: ${statusColor}; font-weight: bold;">
+                                    ${status}
+                                </div>
+                                <div style="font-size: 13px; color: rgba(255, 255, 255, 0.6); margin-top: 5px;">
+                                    레벨 ${t.level} 달성 시 획득
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
         }
 
         function init() {
