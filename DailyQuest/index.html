@@ -487,8 +487,6 @@
         .hidden { display: none; }
     </style>
 </head>
-
-
 <body>
     <!-- Splash -->
     <div class="splash" id="splash">
@@ -579,7 +577,9 @@
 
             <div class="quests-header">
                 <div class="quests-title">⚡ 오늘의 퀘스트</div>
-                <button class="refresh-btn" onclick="genQuests()">🔄 새로고침</button>
+                <button class="refresh-btn" onclick="refreshQuests()">
+                    🔄 새로고침 (<span id="refreshCount">3</span>/3)
+                </button>
             </div>
             <div id="questsList"></div>
             <div id="completeBanner" class="complete-banner hidden">
@@ -734,7 +734,6 @@
         </div>
     </div>
 
-
     <script>
         let state = {
             level: 1,
@@ -745,7 +744,8 @@
             total: 0,
             easyCount: 0,
             mediumCount: 0,
-            hardCount: 0
+            hardCount: 0,
+            refreshCount: 0
         };
 
         const pools = {
@@ -806,8 +806,13 @@
 
         function genQuests() {
             const today = new Date().toDateString();
+            if (state.date !== today) {
+                state.refreshCount = 3; // Reset refresh count on new day
+            }
+            
             if (state.date === today && state.quests.length > 0) {
                 render();
+                updateRefreshButton();
                 return;
             }
 
@@ -819,8 +824,93 @@
             
             state.completed = new Set();
             state.date = today;
+            state.refreshCount = 3;
             save();
             render();
+            updateRefreshButton();
+        }
+
+        function refreshQuests() {
+            // Check if all quests are completed
+            if (state.completed.size === state.quests.length) {
+                alert('❌ 모든 퀘스트를 완료했습니다!\n새로 생성할 수 있는 퀘스트가 없습니다.');
+                return;
+            }
+
+            // Check refresh count
+            if (state.refreshCount <= 0) {
+                alert('❌ 오늘의 새로고침 기회를 모두 사용했습니다!\n내일 다시 시도해주세요.');
+                return;
+            }
+
+            if (!confirm(`🔄 새로고침 하시겠습니까?\n남은 기회: ${state.refreshCount}/3\n\n완료하지 않은 퀘스트만 새로 생성됩니다.`)) {
+                return;
+            }
+
+            state.refreshCount--;
+
+            // Get completed quests
+            const completedQuests = state.quests.filter(q => state.completed.has(q.id));
+            
+            // Count how many new quests we need by difficulty
+            const completedByDiff = {
+                easy: completedQuests.filter(q => getDiff(q.exp) === 'easy').length,
+                medium: completedQuests.filter(q => getDiff(q.exp) === 'medium').length,
+                hard: completedQuests.filter(q => getDiff(q.exp) === 'hard').length
+            };
+
+            // Generate new quests for incomplete ones
+            const newQuests = [
+                ...shuffle(pools.easy).slice(0, 2 - completedByDiff.easy),
+                ...shuffle(pools.medium).slice(0, 2 - completedByDiff.medium),
+                ...shuffle(pools.hard).slice(0, 1 - completedByDiff.hard)
+            ];
+
+            // Reassign IDs
+            let nextId = 0;
+            const allQuests = [];
+            
+            // Add completed quests first
+            completedQuests.forEach(q => {
+                allQuests.push({ ...q, id: nextId++ });
+            });
+            
+            // Add new quests
+            newQuests.forEach(q => {
+                allQuests.push({ ...q, id: nextId++ });
+            });
+
+            // Update completed IDs
+            const newCompleted = new Set();
+            for (let i = 0; i < completedQuests.length; i++) {
+                newCompleted.add(i);
+            }
+
+            state.quests = allQuests;
+            state.completed = newCompleted;
+
+            save();
+            render();
+            updateRefreshButton();
+
+            if (navigator.vibrate) navigator.vibrate(50);
+        }
+
+        function updateRefreshButton() {
+            const btn = document.querySelector('.refresh-btn');
+            const countSpan = document.getElementById('refreshCount');
+            
+            if (countSpan) {
+                countSpan.textContent = state.refreshCount;
+            }
+
+            if (state.refreshCount <= 0) {
+                btn.style.opacity = '0.5';
+                btn.style.cursor = 'not-allowed';
+            } else {
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+            }
         }
 
         function complete(id) {
@@ -943,6 +1033,7 @@
             document.getElementById('questScreen').classList.add('active');
             genQuests();
             updateUI();
+            updateRefreshButton();
         }
 
         function goBack() {
