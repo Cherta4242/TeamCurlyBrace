@@ -487,6 +487,8 @@
         .hidden { display: none; }
     </style>
 </head>
+
+
 <body>
     <!-- Splash -->
     <div class="splash" id="splash">
@@ -530,7 +532,7 @@
             <span>→</span>
         </button>
 
-        <button class="menu-btn">
+        <button class="menu-btn" onclick="showStats()">
             <span>📊</span>
             <div class="btn-text">
                 통계
@@ -593,6 +595,107 @@
         </div>
     </div>
 
+    <!-- Stats Screen -->
+    <div class="quest-screen" id="statsScreen">
+        <button class="back-btn" onclick="goBackFromStats()">← 메인으로</button>
+
+        <div class="container">
+            <div class="header">
+                <div style="text-align: center;">
+                    <div style="font-size: 60px; margin-bottom: 15px;">📊</div>
+                    <div style="font-size: 28px; font-weight: bold; color: white; margin-bottom: 5px;">나의 성장 기록</div>
+                    <div style="font-size: 14px; color: rgba(255, 255, 255, 0.7);">Daily Quest와 함께한 여정</div>
+                </div>
+            </div>
+
+            <!-- Main Stats -->
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
+                <div style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 140, 0, 0.2)); backdrop-filter: blur(10px); border-radius: 15px; padding: 25px; text-align: center; border: 2px solid rgba(255, 215, 0, 0.3);">
+                    <div style="font-size: 40px; margin-bottom: 10px;">⚡</div>
+                    <div style="font-size: 14px; color: rgba(255, 255, 255, 0.7); margin-bottom: 5px;">현재 레벨</div>
+                    <div style="font-size: 36px; font-weight: bold; color: #ffd700;" id="statsLevel">1</div>
+                </div>
+                <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2)); backdrop-filter: blur(10px); border-radius: 15px; padding: 25px; text-align: center; border: 2px solid rgba(16, 185, 129, 0.3);">
+                    <div style="font-size: 40px; margin-bottom: 10px;">✅</div>
+                    <div style="font-size: 14px; color: rgba(255, 255, 255, 0.7); margin-bottom: 5px;">총 완료 퀘스트</div>
+                    <div style="font-size: 36px; font-weight: bold; color: #6ee7b7;" id="statsTotal">0</div>
+                </div>
+            </div>
+
+            <!-- Detailed Stats -->
+            <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 20px; padding: 30px; margin-bottom: 20px;">
+                <div style="font-size: 20px; font-weight: bold; color: white; margin-bottom: 20px;">📈 상세 통계</div>
+                
+                <div style="margin-bottom: 25px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 24px;">🟢</span>
+                            <span style="color: white; font-size: 16px;">쉬움 퀘스트</span>
+                        </div>
+                        <span style="color: #6ee7b7; font-size: 20px; font-weight: bold;" id="statsEasy">0</span>
+                    </div>
+                    <div style="height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 10px; overflow: hidden;">
+                        <div id="statsEasyBar" style="height: 100%; background: linear-gradient(90deg, #10b981, #059669); width: 0%; transition: width 0.5s;"></div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 24px;">🔵</span>
+                            <span style="color: white; font-size: 16px;">보통 퀘스트</span>
+                        </div>
+                        <span style="color: #93c5fd; font-size: 20px; font-weight: bold;" id="statsMedium">0</span>
+                    </div>
+                    <div style="height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 10px; overflow: hidden;">
+                        <div id="statsMediumBar" style="height: 100%; background: linear-gradient(90deg, #3b82f6, #2563eb); width: 0%; transition: width 0.5s;"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 24px;">🟣</span>
+                            <span style="color: white; font-size: 16px;">어려움 퀘스트</span>
+                        </div>
+                        <span style="color: #c084fc; font-size: 20px; font-weight: bold;" id="statsHard">0</span>
+                    </div>
+                    <div style="height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 10px; overflow: hidden;">
+                        <div id="statsHardBar" style="height: 100%; background: linear-gradient(90deg, #a855f7, #9333ea); width: 0%; transition: width 0.5s;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Achievement Stats -->
+            <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 20px; padding: 30px;">
+                <div style="font-size: 20px; font-weight: bold; color: white; margin-bottom: 20px;">🏆 업적 현황</div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; margin-bottom: 12px;">
+                    <span style="color: rgba(255, 255, 255, 0.9);">획득한 칭호</span>
+                    <span style="color: #ffd700; font-weight: bold; font-size: 18px;"><span id="statsUnlockedTitles">1</span> / 5</span>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; margin-bottom: 12px;">
+                    <span style="color: rgba(255, 255, 255, 0.9);">다음 레벨까지</span>
+                    <span style="color: #ffd700; font-weight: bold; font-size: 18px;"><span id="statsExpNeeded">0</span> EXP</span>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 10px;">
+                    <span style="color: rgba(255, 255, 255, 0.9);">총 획득 EXP</span>
+                    <span style="color: #ffd700; font-weight: bold; font-size: 18px;"><span id="statsTotalExp">0</span> EXP</span>
+                </div>
+            </div>
+
+            <!-- Motivational Message -->
+            <div style="background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 15px; padding: 25px; margin-top: 20px; text-align: center;">
+                <div style="font-size: 24px; margin-bottom: 10px;">✨</div>
+                <div style="color: white; font-size: 16px; line-height: 1.6;" id="statsMessage">
+                    매일 조금씩 성장하고 있어요!
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Titles Screen -->
     <div class="quest-screen" id="titlesScreen">
         <button class="back-btn" onclick="goBackFromTitles()">← 메인으로</button>
@@ -631,6 +734,7 @@
         </div>
     </div>
 
+
     <script>
         let state = {
             level: 1,
@@ -638,7 +742,10 @@
             completed: new Set(),
             date: null,
             quests: [],
-            total: 0
+            total: 0,
+            easyCount: 0,
+            mediumCount: 0,
+            hardCount: 0
         };
 
         const pools = {
@@ -722,6 +829,12 @@
             const q = state.quests.find(x => x.id === id);
             state.completed.add(id);
             state.total++;
+
+            // Track by difficulty
+            const diff = getDiff(q.exp);
+            if (diff === 'easy') state.easyCount++;
+            else if (diff === 'medium') state.mediumCount++;
+            else if (diff === 'hard') state.hardCount++;
 
             if (navigator.vibrate) navigator.vibrate(50);
 
@@ -846,6 +959,56 @@
         function goBackFromTitles() {
             document.getElementById('titlesScreen').classList.remove('active');
             document.getElementById('menu').classList.add('active');
+        }
+
+        function showStats() {
+            document.getElementById('menu').classList.remove('active');
+            document.getElementById('statsScreen').classList.add('active');
+            updateStatsScreen();
+        }
+
+        function goBackFromStats() {
+            document.getElementById('statsScreen').classList.remove('active');
+            document.getElementById('menu').classList.add('active');
+        }
+
+        function updateStatsScreen() {
+            document.getElementById('statsLevel').textContent = state.level;
+            document.getElementById('statsTotal').textContent = state.total;
+            
+            document.getElementById('statsEasy').textContent = state.easyCount;
+            document.getElementById('statsMedium').textContent = state.mediumCount;
+            document.getElementById('statsHard').textContent = state.hardCount;
+
+            // Calculate percentages for bars
+            const total = state.total || 1;
+            document.getElementById('statsEasyBar').style.width = (state.easyCount / total * 100) + '%';
+            document.getElementById('statsMediumBar').style.width = (state.mediumCount / total * 100) + '%';
+            document.getElementById('statsHardBar').style.width = (state.hardCount / total * 100) + '%';
+
+            // Unlocked titles
+            const unlockedCount = titles.filter(t => state.level >= t.level).length;
+            document.getElementById('statsUnlockedTitles').textContent = unlockedCount;
+
+            // Next level EXP
+            const max = state.level * 100;
+            document.getElementById('statsExpNeeded').textContent = max - state.exp;
+
+            // Total EXP earned
+            const totalExp = (state.level - 1) * 100 + state.exp;
+            document.getElementById('statsTotalExp').textContent = totalExp;
+
+            // Motivational message
+            const messages = [
+                '매일 조금씩 성장하고 있어요!',
+                '꾸준함이 당신의 무기입니다! 💪',
+                '이미 충분히 잘하고 있어요! ✨',
+                '오늘도 한 걸음 전진했네요! 🚀',
+                '루틴의 힘을 느끼고 계신가요? 🌟',
+                '당신의 노력이 빛나고 있어요! ⭐',
+                '계속 이대로만 가면 됩니다! 🎯'
+            ];
+            document.getElementById('statsMessage').textContent = messages[state.level % messages.length];
         }
 
         function updateTitlesScreen() {
