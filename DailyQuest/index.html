@@ -15,6 +15,35 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            transition: background 0.3s ease;
+        }
+
+        body.dark {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        .dark-mode-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+
+        .dark-mode-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
         }
 
         /* Splash Screen */
@@ -121,6 +150,11 @@
             border-radius: 15px;
             padding: 20px 30px;
             text-align: center;
+            transition: background 0.3s ease;
+        }
+
+        body.dark .stat-card {
+            background: rgba(0, 0, 0, 0.3);
         }
 
         .stat-label {
@@ -154,9 +188,18 @@
             transition: all 0.3s;
         }
 
+        body.dark .menu-btn {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
         .menu-btn:hover {
             background: rgba(255, 255, 255, 0.25);
             transform: translateY(-2px);
+        }
+
+        body.dark .menu-btn:hover {
+            background: rgba(0, 0, 0, 0.5);
         }
 
         .menu-btn.primary {
@@ -204,6 +247,19 @@
             cursor: pointer;
             margin-bottom: 20px;
             font-size: 16px;
+            transition: background 0.3s ease;
+        }
+
+        body.dark .back-btn {
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        body.dark .back-btn:hover {
+            background: rgba(0, 0, 0, 0.6);
         }
 
         .container {
@@ -217,6 +273,11 @@
             border-radius: 20px;
             padding: 30px;
             margin-bottom: 20px;
+            transition: background 0.3s ease;
+        }
+
+        body.dark .header {
+            background: rgba(0, 0, 0, 0.3);
         }
 
         .title-section {
@@ -287,6 +348,19 @@
             padding: 10px 15px;
             border-radius: 10px;
             cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        body.dark .refresh-btn {
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .refresh-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        body.dark .refresh-btn:hover {
+            background: rgba(0, 0, 0, 0.6);
         }
 
         .quest-card {
@@ -297,6 +371,19 @@
             margin-bottom: 12px;
             display: flex;
             gap: 15px;
+            transition: background 0.3s ease;
+        }
+
+        body.dark .quest-card {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .quest-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        body.dark .quest-card:hover {
+            background: rgba(0, 0, 0, 0.5);
         }
 
         .quest-card.completed {
@@ -401,6 +488,11 @@
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 30px;
+            transition: background 0.3s ease;
+        }
+
+        body.dark .titles-section {
+            background: rgba(0, 0, 0, 0.3);
         }
 
         .titles-header {
@@ -421,6 +513,11 @@
             border-radius: 12px;
             text-align: center;
             border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        body.dark .title-card {
+            border: 2px solid rgba(255, 255, 255, 0.05);
         }
 
         .title-card.unlocked {
@@ -431,6 +528,10 @@
         .title-card.locked {
             background: rgba(255, 255, 255, 0.05);
             opacity: 0.5;
+        }
+
+        body.dark .title-card.locked {
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .title-card .icon {
@@ -488,6 +589,11 @@
     </style>
 </head>
 <body>
+    <!-- Dark Mode Toggle -->
+    <button class="dark-mode-toggle" id="darkModeToggle" onclick="toggleDarkMode()">
+        <span id="darkModeIcon">🌙</span>
+    </button>
+
     <!-- Splash -->
     <div class="splash" id="splash">
         <div class="splash-logo">🎯</div>
@@ -745,7 +851,8 @@
             easyCount: 0,
             mediumCount: 0,
             hardCount: 0,
-            refreshCount: 0
+            refreshCount: 0,
+            darkMode: false
         };
 
         const pools = {
@@ -1140,10 +1247,27 @@
         function init() {
             load();
             updateMenu();
+            
+            // Apply dark mode if saved
+            if (state.darkMode) {
+                document.body.classList.add('dark');
+                document.getElementById('darkModeIcon').textContent = '☀️';
+            }
+            
             setTimeout(() => {
                 document.getElementById('splash').style.display = 'none';
                 document.getElementById('menu').classList.add('active');
             }, 3000);
+        }
+
+        function toggleDarkMode() {
+            state.darkMode = !state.darkMode;
+            document.body.classList.toggle('dark');
+            
+            const icon = document.getElementById('darkModeIcon');
+            icon.textContent = state.darkMode ? '☀️' : '🌙';
+            
+            save();
         }
 
         init();
